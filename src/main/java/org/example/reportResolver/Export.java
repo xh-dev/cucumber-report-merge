@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Export {
@@ -30,7 +31,7 @@ public class Export {
                 final var os = new FileOutputStream(outFile)
         ) {
             for(Resolver.FormattedResult entry : listOfEntry){
-                final var line = String.format("%s, %s, %s\n", entry.getTag().getName(), sfd.format(entry.getDate()), entry.getResult().name());
+                final var line = String.format("%s, %s, %s, %s\n", entry.getTag().getName(), sfd.format(entry.getDate()), entry.getResult().name(), Optional.ofNullable(entry.getUrl()).orElse(""));
                 os.write(line.getBytes());
             }
         }

@@ -75,6 +75,6 @@ public class Merge {
         final var moveFrom = target;
         final var moveTo = outDir.toPath().resolve(target.getName());
         final var copyResult = moveFrom.renameTo(moveTo.toFile());
-        System.out.println(String.format("'%s' to '%s', copy result: ", moveFrom, moveTo, copyResult));
+        System.out.println(String.format("'%s' to '%s', copy result: %b", moveFrom, moveTo, copyResult));
     }
 }
