@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Export {
@@ -19,10 +20,9 @@ public class Export {
         }
 
         final var map = Merge.load(file);
-//        final var map = new HashMap<Resolver.TestElement.Tag, Resolver.FormattedResult>();
         final var listOfEntry = map.entrySet().stream()
                 .filter(it -> it.getKey().getName().startsWith("@UAT-TC"))
-                .map(it -> it.getValue())
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
         final var sfd = new SimpleDateFormat("dd/MMM/YYYY HH:mm");

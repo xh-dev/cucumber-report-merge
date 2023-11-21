@@ -25,6 +25,10 @@ public class CmdMerge implements Callable<Integer> {
     )
     File backupDir;
 
+    @CommandLine.Option(
+            names = {"--url"}, description = "url"
+    )
+    String url;
     @Override
     public Integer call() throws Exception {
         if((!target.exists()) || (!target.isDirectory())){
@@ -34,7 +38,7 @@ public class CmdMerge implements Callable<Integer> {
             final var pattern = Pattern.compile("cucumber.json_\\d+");
             if(!pattern.matcher(file.getName()).matches())
                 continue;
-            Merge.merge(source, file, backupDir);
+            Merge.merge(source, file, backupDir, url);
         }
         return 0;
     }

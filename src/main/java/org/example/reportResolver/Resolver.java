@@ -37,6 +37,7 @@ public class Resolver {
         private TestElement.Tag tag;
         private Date date;
         private TestElement.Status result;
+        private String url;
     }
 
     @Data
@@ -150,7 +151,7 @@ public class Resolver {
     }
 
 
-    public static List<FormattedResult> resolve(File file) throws IOException {
+    public static List<FormattedResult> resolve(File file, String url) throws IOException {
         try (
                 final var fileIn = new FileInputStream(file);
         ) {
@@ -182,7 +183,7 @@ public class Resolver {
                                             it.getAfter().stream().map(TestElement.After::getResult)
                                     )
                             ).map(x -> {
-                                return FormattedResult.builder().tag(tag).date(date).result(x.getStatus()).build();
+                                return FormattedResult.builder().tag(tag).date(date).result(x.getStatus()).url(url).build();
                             });
                         });
                     })
