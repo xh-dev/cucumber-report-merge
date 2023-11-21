@@ -38,6 +38,7 @@ public class Resolver {
         private Date date;
         private TestElement.Status result;
         private String url;
+        private String user;
     }
 
     @Data
@@ -151,7 +152,7 @@ public class Resolver {
     }
 
 
-    public static List<FormattedResult> resolve(File file, String url) throws IOException {
+    public static List<FormattedResult> resolve(File file, String url, String user) throws IOException {
         try (
                 final var fileIn = new FileInputStream(file);
         ) {
@@ -171,7 +172,7 @@ public class Resolver {
                     throw new RuntimeException(ex);
                 }
             };
-            final var result = listData.stream()
+            return listData.stream()
                     .flatMap(it -> it.elements.stream())
                     .flatMap(it -> {
                         final var date = getDate.apply(it.startTimestamp);
@@ -183,7 +184,12 @@ public class Resolver {
                                             it.getAfter().stream().map(TestElement.After::getResult)
                                     )
                             ).map(x -> {
-                                return FormattedResult.builder().tag(tag).date(date).result(x.getStatus()).url(url).build();
+                                return FormattedResult.builder()
+                                        .tag(tag)
+                                        .date(date)
+                                        .result(x.getStatus())
+                                        .url(url)
+                                        .user(user).build();
                             });
                         });
                     })
@@ -212,8 +218,6 @@ public class Resolver {
                             (map, entry) -> map
                     )
                     .values().stream().sorted(Comparator.comparing(a -> a.tag.name)).collect(Collectors.toList());
-            return result;
         }
-//        result.forEach(System.out::println);
     }
 }

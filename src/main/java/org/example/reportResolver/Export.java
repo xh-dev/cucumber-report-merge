@@ -31,7 +31,13 @@ public class Export {
                 final var os = new FileOutputStream(outFile)
         ) {
             for(Resolver.FormattedResult entry : listOfEntry){
-                final var line = String.format("%s, %s, %s, %s\n", entry.getTag().getName(), sfd.format(entry.getDate()), entry.getResult().name(), Optional.ofNullable(entry.getUrl()).orElse(""));
+                final var line = String.format("%s, %s, %s, %s, %s\n",
+                        entry.getTag().getName(),
+                        sfd.format(entry.getDate()),
+                        entry.getResult().name(),
+                        Optional.ofNullable(entry.getUrl()).orElse(""),
+                        Optional.ofNullable(entry.getUser()).orElse("")
+                );
                 os.write(line.getBytes());
             }
         }

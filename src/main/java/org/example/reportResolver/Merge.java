@@ -51,7 +51,7 @@ public class Merge {
         }
     }
     @SneakyThrows
-    public static void merge(File source, File target, File outDir, String url) {
+    public static void merge(File source, File target, File outDir, String url, String user) {
         if (!source.exists()) {
             createEmptyFile(source);
         }
@@ -66,7 +66,7 @@ public class Merge {
         }
 
         final var sourceMap = load(source);
-        final var targetData = Resolver.resolve(target, url);
+        final var targetData = Resolver.resolve(target, url, user);
         for(Resolver.FormattedResult data : targetData){
             sourceMap.put(data.getTag(), data);
         }
