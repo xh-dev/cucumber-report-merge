@@ -1,7 +1,9 @@
 package org.example;
 
 import org.example.cmd.CmdBackup;
+import org.example.cmd.CmdExport;
 import org.example.cmd.CmdMerge;
+import org.example.reportResolver.Export;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -12,7 +14,8 @@ import java.util.concurrent.Callable;
         name = "cucumber-report-handler",
         subcommands = {
                 CmdBackup.class,
-                CmdMerge.class
+                CmdMerge.class,
+                CmdExport.class
         },
         description = "A simple program to backup and generate report"
 )

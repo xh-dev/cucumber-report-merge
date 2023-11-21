@@ -15,7 +15,6 @@ public class Backup {
     public static void copy(File in, File outDir) {
         if((!in.exists()) || (!in.isFile())){
             throw new RuntimeException("Input file is not exists or file: "+in);
-
         }
         if((! outDir.exists()) || (!outDir.isDirectory())){
             throw new RuntimeException("Output directory not exists or not directory: "+outDir);

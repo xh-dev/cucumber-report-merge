@@ -25,7 +25,7 @@ public class Merge {
         }
     }
     @SneakyThrows
-    private static Map<Resolver.TestElement.Tag, Resolver.FormattedResult> load(File file){
+    public static Map<Resolver.TestElement.Tag, Resolver.FormattedResult> load(File file){
         try (
                 final var fis = new FileInputStream(file);
         ) {
