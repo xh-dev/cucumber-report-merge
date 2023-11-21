@@ -21,8 +21,6 @@ import java.util.concurrent.Callable;
 public class Main implements Callable<Integer> {
 
     public static void main(String[] args) throws IOException {
-//        Resolver.resolve(new File("C:\\Users\\XH20258\\Downloads\\temp\\cucumber-reports\\cucumber.json"));
-//        Resolver.resolve(new File("/home/xeth/Downloads/temp/cucumber-reports/cucumber.json"));
         int exitCode = new CommandLine(new Main()).execute(args);
         System.exit(exitCode);
     }
