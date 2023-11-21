@@ -71,7 +71,10 @@ public class Merge {
             sourceMap.put(data.getTag(), data);
         }
         write(sourceMap, source);
-        final var copyResult = target.renameTo(outDir.toPath().resolve(target.getName()).toFile());
-        System.out.println("Copy result: "+copyResult);
+
+        final var moveFrom = target;
+        final var moveTo = outDir.toPath().resolve(target.getName());
+        final var copyResult = moveFrom.renameTo(moveTo.toFile());
+        System.out.println(String.format("'%s' to '%s', copy result: ", moveFrom, moveTo, copyResult));
     }
 }

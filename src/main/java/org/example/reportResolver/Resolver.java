@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,9 +48,10 @@ public class Resolver {
     @Data
     public static class TestElement {
         public static class StatusSerializer extends StdSerializer<Status> {
-            public StatusSerializer(){
+            public StatusSerializer() {
                 super(Status.class);
             }
+
             protected StatusSerializer(Class<Status> t) {
                 super(t);
             }
@@ -61,13 +61,14 @@ public class Resolver {
                 gen.writeString(value.name());
             }
         }
+
         @JsonSerialize(using = StatusSerializer.class)
         @JsonFormat(shape = JsonFormat.Shape.OBJECT)
         public enum Status {
             passed, failed, skipped;
 
             @JsonValue()
-            public String asJson(){
+            public String asJson() {
                 return this.name();
             }
 
@@ -150,65 +151,68 @@ public class Resolver {
 
 
     public static List<FormattedResult> resolve(File file) throws IOException {
-        final var fileIn = new FileInputStream(file);
-        final var mapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        final var listData = mapper.readValue(fileIn.readAllBytes(), new TypeReference<List<TestResult>>() {
-        });
+        try (
+                final var fileIn = new FileInputStream(file);
+        ) {
 
-        final var elementTag = "elements";
+            final var mapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            final var listData = mapper.readValue(fileIn.readAllBytes(), new TypeReference<List<TestResult>>() {
+            });
 
-        final var sdf = new SimpleDateFormat(StdDateFormat.DATE_FORMAT_STR_ISO8601);
-        final var getDate = (Function<String, Date>) (String dateStr) -> {
-            try {
-                return sdf.parse(dateStr);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        };
-        final var result = listData.stream()
-                .flatMap(it -> it.elements.stream())
-                .flatMap(it -> {
-                    final var date = getDate.apply(it.startTimestamp);
-                    return it.getTags().stream().flatMap(tag -> {
-                        return Stream.concat(
-                                it.getBefore().stream().map(TestElement.Before::getResult),
-                                Stream.concat(
-                                        it.getSteps().stream().map(TestElement.Step::getResult),
-                                        it.getAfter().stream().map(TestElement.After::getResult)
-                                )
-                        ).map(x -> {
-                            return FormattedResult.builder().tag(tag).date(date).result(x.getStatus()).build();
+            final var elementTag = "elements";
+
+            final var sdf = new SimpleDateFormat(StdDateFormat.DATE_FORMAT_STR_ISO8601);
+            final var getDate = (Function<String, Date>) (String dateStr) -> {
+                try {
+                    return sdf.parse(dateStr);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            };
+            final var result = listData.stream()
+                    .flatMap(it -> it.elements.stream())
+                    .flatMap(it -> {
+                        final var date = getDate.apply(it.startTimestamp);
+                        return it.getTags().stream().flatMap(tag -> {
+                            return Stream.concat(
+                                    it.getBefore().stream().map(TestElement.Before::getResult),
+                                    Stream.concat(
+                                            it.getSteps().stream().map(TestElement.Step::getResult),
+                                            it.getAfter().stream().map(TestElement.After::getResult)
+                                    )
+                            ).map(x -> {
+                                return FormattedResult.builder().tag(tag).date(date).result(x.getStatus()).build();
+                            });
                         });
-                    });
-                })
-                .reduce(
-                        new HashMap<TestElement.Tag, FormattedResult>(),
-                        (map, entry) -> {
-                            if (map.containsKey(entry.tag)) {
-                                final var cur = map.get(entry.tag);
-                                switch (cur.getResult()) {
-                                    case failed:
-                                        break;
-                                    case skipped:
-                                        if (entry.getResult() == TestElement.Status.failed)
-                                            map.put(entry.getTag(), entry);
-                                        break;
-                                    case passed:
-                                        if (entry.getResult() != TestElement.Status.passed)
-                                            map.put(entry.tag, entry);
-                                        break;
+                    })
+                    .reduce(
+                            new HashMap<TestElement.Tag, FormattedResult>(),
+                            (map, entry) -> {
+                                if (map.containsKey(entry.tag)) {
+                                    final var cur = map.get(entry.tag);
+                                    switch (cur.getResult()) {
+                                        case failed:
+                                            break;
+                                        case skipped:
+                                            if (entry.getResult() == TestElement.Status.failed)
+                                                map.put(entry.getTag(), entry);
+                                            break;
+                                        case passed:
+                                            if (entry.getResult() != TestElement.Status.passed)
+                                                map.put(entry.tag, entry);
+                                            break;
+                                    }
+                                } else {
+                                    map.put(entry.tag, entry);
                                 }
-                            } else {
-                                map.put(entry.tag, entry);
-                            }
-                            return map;
-                        },
-                        (map, entry) -> map
-                )
-                .values().stream().sorted(Comparator.comparing(a -> a.tag.name)).collect(Collectors.toList());
-        ;
-        return result;
+                                return map;
+                            },
+                            (map, entry) -> map
+                    )
+                    .values().stream().sorted(Comparator.comparing(a -> a.tag.name)).collect(Collectors.toList());
+            return result;
+        }
 //        result.forEach(System.out::println);
     }
 }
